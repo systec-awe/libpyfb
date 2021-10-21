@@ -57,7 +57,7 @@ class Framebuffer():
 		self.fbdev = os.open(self.fbpath, os.O_RDWR)
 
 		# Map framebuffer to memory
-		self.fb = mmap.mmap(self.fbdev, screenx*screeny*bpp//8, mmap.MAP_SHARED, mmap.PROT_WRITE|mmap.PROT_READ, offset=0)
+		self.fb = mmap.mmap(self.fbdev, self.screenx*self.screeny*self.bpp//8, mmap.MAP_SHARED, mmap.PROT_WRITE|mmap.PROT_READ, offset=0)
 
 	def drawpixel(self, x, y, r, g, b, t=0):
 		'''
@@ -85,7 +85,7 @@ class Framebuffer():
 
 		else:
 			# 16 bit per pixel
-			self.fb.write(r.to_bytes(1, byteorder='little') << 11 | g.to_bytes(1, byteorder='little') << 5 | b.to_bytes(1, byteorder='little'))
+			self.fb.write((((r & 0xFF ) << 11 | (g & 0xFF) << 5 | (b & 0xFF)) & 0xFFFF).to_bytes(1, byteorder='little'))
 
 	def clear(self, r=255, g=255, b=255, t=0):
 		'''
@@ -108,4 +108,4 @@ if __name__ == "__main__":
 	fb0.clear()
 	for y in range(fb0.screeny):
 		for x in range(fb0.screenx):
-			fb0.drawpixel(x, y, x%300, y%400, (x+y)%500)
+			fb0.drawpixel(x, y, x%255, y%255, (x+y)%255)
